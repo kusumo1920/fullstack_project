@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  username    String    @db.VarChar(50) @unique
+  email       String    @db.VarChar(100) @unique
+  password    String    @db.VarChar(255)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @default(now())
+
+  games       Game[]
+
+  @@map("users")
+}
+
+model Game {
+  id            Int       @id @default(autoincrement())
+  user          User      @relation(fields: [user_id], references: [id])
+  user_id       Int       
+  initial_dices Int       @default(0)
+  is_finished   Boolean   @db.Bit(1) @default(false)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @default(now())
+
+  game_players  GamePlayer[]
+  game_history  GameHistory[]
+
+  @@map("games")
+}
+
+model GamePlayer {
+  id            Int       @id @default(autoincrement())
+  game          Game      @relation(fields: [game_id], references: [id])
+  game_id       Int
+  name          String    @db.VarChar(50)
+  last_score    Int       @default(0)
+  is_winner     Boolean?
+
+  game_history  GameHistory[]   
+
+  @@unique([game_id, name])
+  @@map("game_players")
+}
+
+model GameHistory {
+  id                  Int         @id @default(autoincrement())
+  game                Game        @relation(fields: [game_id], references: [id])
+  game_id             Int
+  game_player         GamePlayer  @relation(fields: [game_player_id], references: [id])
+  game_player_id      Int
+  before_score        Int
+  after_score         Int
+  before_dices        Json
+  after_dices         Json
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @default(now())
+
+  @@map("game_history")
+}

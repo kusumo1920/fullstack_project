@@ -1,0 +1,14 @@
+.gameHistoryTable, td, th {
+  border: 1px solid;
+}
+
+.gamePage button {
+    margin-top: 20px;
+    padding: 10px 10px;
+    font-size: 17px !important;
+}
+
+.gameHistoryTable {
+  min-width: 100%;
+  border-collapse: collapse;
+}
